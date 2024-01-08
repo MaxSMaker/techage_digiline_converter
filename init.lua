@@ -8,7 +8,6 @@ local CYCLE_TIME = 2
 
 local function formspec(meta)
 	local channel = meta:get_string("channel") or ""
-	print(channel)
 	return "size[7.5,3]" ..
 		"field[0.5,1;7,1;channel;" .. S("Channel") .. ";" .. channel .. "]" .. "button_exit[2,2;3,1;exit;" .. S("Save") .. "]"
 end
@@ -125,9 +124,6 @@ techage.register_node(
 	{"techage_digiline_converter:ta4_digiline_converter"},
 	{
 		on_recv_message = function(pos, src, topic, payload)
-			print(src)
-			print(topic)
-			print(payload)
 			local mem = techage.get_mem(pos)
 			mem.overload_cnt = (mem.overload_cnt or 0) + 1
 			if mem.overload_cnt > OVER_LOAD_MAX then
@@ -136,7 +132,6 @@ techage.register_node(
 				return false
 			end
 			local channel = minetest.get_meta(pos):get_string("channel")
-			print(channel)
 			digilines.receptor_send(pos, digilines.rules.default, channel, {number = src, topic = topic, payload = payload})
 		end,
 		on_node_load = function(pos)

@@ -12,7 +12,7 @@ local function formspec(meta)
 		"field[0.5,1;7,1;channel;" .. S("Channel") .. ";" .. channel .. "]" .. "button_exit[2,2;3,1;exit;" .. S("Save") .. "]"
 end
 
-local function send_message(pos, number, topic, payload)
+local function send_message(pos, number, command, data)
 	local meta = M(pos)
 	local mem = techage.get_mem(pos)
 	mem.overload_cnt = (mem.overload_cnt or 0) + 1
@@ -23,7 +23,7 @@ local function send_message(pos, number, topic, payload)
 		return false
 	end
 	local own_num = meta:get_string("node_number")
-	return techage.send_single(own_num, number, topic, payload)
+	return techage.send_single(own_num, number, command, data)
 end
 
 local function on_receive_fields(pos, _, fields, sender)
@@ -61,7 +61,7 @@ end
 
 local function parse_msg(msg)
 	if type(msg) == "table" then
-		return msg.number, msg.topic, msg.payload
+		return msg.number, msg.command, msg.data
 	end
 	if type(msg) == "string" then
 		return msg:match("^([0-9]+)%s+(%w+)%s*(.*)$") -- <number> <command> [<data>]
@@ -72,15 +72,15 @@ end
 local on_digiline_receive = function(pos, _, channel, msg)
 	local setchan = minetest.get_meta(pos):get_string("channel")
 	if channel == setchan then
-		local number, topic, payload = parse_msg(msg)
-		if number ~= nil and topic ~= nil then
-			local result = send_message(pos, number, topic, payload)
+		local number, command, data = parse_msg(msg)
+		if number ~= nil and command ~= nil then
+			local result = send_message(pos, number, command, data)
 			if result ~= nil then
 				digilines.receptor_send(
 					pos,
 					digilines.rules.default,
 					channel,
-					{number = number, topic = topic, payload = payload, result = result}
+					{number = number, command = command, data = data, result = result}
 				)
 			end
 		end
@@ -145,7 +145,7 @@ techage.register_node(
 				return false
 			end
 			local channel = minetest.get_meta(pos):get_string("channel")
-			digilines.receptor_send(pos, digilines.rules.default, channel, {number = src, topic = topic, payload = payload})
+			digilines.receptor_send(pos, digilines.rules.default, channel, {number = src, command = topic, data = payload})
 		end,
 		on_node_load = function(pos)
 			minetest.get_node_timer(pos):start(CYCLE_TIME)

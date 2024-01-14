@@ -59,17 +59,30 @@ local function after_dig_node(pos, oldnode, oldmetadata)
 	mesecon.on_dignode(pos, oldnode)
 end
 
+local function parse_msg(msg)
+	if type(msg) == "table" then
+		return msg.number, msg.topic, msg.payload
+	end
+	if type(msg) == "string" then
+		return msg:match("^([0-9]+)%s+(%w+)%s*(.*)$") -- <number> <command> [<data>]
+	end
+	return nil, nil, nil
+end
+
 local on_digiline_receive = function(pos, _, channel, msg)
 	local setchan = minetest.get_meta(pos):get_string("channel")
-	if channel == setchan and msg.number ~= nil and msg.topic ~= nil then
-		local result = send_message(pos, msg.number, msg.topic, msg.payload)
-		if result ~= nil then
-			digilines.receptor_send(
-				pos,
-				digilines.rules.default,
-				channel,
-				{number = msg.number, topic = msg.topic, payload = msg.payload, result = result}
-			)
+	if channel == setchan then
+		local number, topic, payload = parse_msg(msg)
+		if number ~= nil and topic ~= nil then
+			local result = send_message(pos, number, topic, payload)
+			if result ~= nil then
+				digilines.receptor_send(
+					pos,
+					digilines.rules.default,
+					channel,
+					{number = number, topic = topic, payload = payload, result = result}
+				)
+			end
 		end
 	end
 end

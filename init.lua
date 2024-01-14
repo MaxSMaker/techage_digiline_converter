@@ -64,7 +64,8 @@ local function parse_msg(msg)
 		return tonumber(msg.number), msg.command, msg.data
 	end
 	if type(msg) == "string" then
-		return msg:match("^([0-9]+)%s+(%w+)%s*(.*)$") -- <number> <command> [<data>]
+		local number, command, data = msg:match("^([0-9]+)%s+(%w+)%s*(.*)$") -- <number> <command> [<data>]
+		return tonumber(number), command, data
 	end
 	return nil, nil, nil
 end

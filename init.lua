@@ -61,7 +61,7 @@ end
 
 local function parse_msg(msg)
 	if type(msg) == "table" then
-		return msg.number, msg.command, msg.data
+		return tonumber(msg.number), msg.command, msg.data
 	end
 	if type(msg) == "string" then
 		return msg:match("^([0-9]+)%s+(%w+)%s*(.*)$") -- <number> <command> [<data>]
@@ -145,7 +145,12 @@ techage.register_node(
 				return false
 			end
 			local channel = minetest.get_meta(pos):get_string("channel")
-			digilines.receptor_send(pos, digilines.rules.default, channel, {number = src, command = topic, data = payload})
+			digilines.receptor_send(
+				pos,
+				digilines.rules.default,
+				channel,
+				{number = tonumber(src), command = topic, data = payload}
+			)
 		end,
 		on_node_load = function(pos)
 			minetest.get_node_timer(pos):start(CYCLE_TIME)

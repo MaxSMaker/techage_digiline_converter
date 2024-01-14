@@ -27,9 +27,9 @@ digiline_send("converter", "32 count 1")
 The block can process incoming messages (but cannot respond to them):
 
 ```lua
--- Event format:  {type = "digiline", channel = "converter", msg = {number = <src number>, command = "<command>", data = <data>}}
--- Src block number can income as string
-if event.type == "digiline" and event.channel == "converter" and tostring(event.msg.number) == "27" and event.msg.command == "on" then
+-- Event format:  {type = "digiline", channel = "converter", msg = {number = <src block number>, command = "<command>", data = <data>}}
+-- Src block number always income as a number
+if event.type == "digiline" and event.channel == "converter" and event.msg.number == 27 and event.msg.command == "on" then
   port.a = true
 end
 ```

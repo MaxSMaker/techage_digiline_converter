@@ -9,7 +9,7 @@ local CYCLE_TIME = 2
 local function formspec(meta)
 	local channel = meta:get_string("channel") or ""
 	return "size[7.5,3]" ..
-		"field[0.5,1;7,1;channel;" .. S("Channel") .. ";" .. channel .. "]" .. "button_exit[2,2;3,1;exit;" .. S("Save") .. "]"
+		"field[0.5,1;7,1;channel;" .. S("Channel") .. ";" .. minetest.formspec_escape(channel) .. "]" .. "button_exit[2,2;3,1;exit;" .. S("Save") .. "]"
 end
 
 local function send_message(pos, number, command, data)
